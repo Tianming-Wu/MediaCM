@@ -11,14 +11,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS Multimedia)
+find_package(Qt6 REQUIRED COMPONENTS MultimediaWidgets)
 
 set(TS_FILES MediaCM_zh_CN.ts)
 
 set(PROJECT_SOURCES
-        main.cpp
-        videoui.cpp
-        videoui.h
-        videoui.ui
+        main.cpp error.h
+        configcm.h configcm.cpp
+        videoui.cpp videoui.h videoui.ui
+        uires.qrc
         ${TS_FILES}
 )
 
@@ -50,6 +52,8 @@ else()
 endif()
 
 target_link_libraries(MediaCM PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(MediaCM PRIVATE Qt6::Multimedia)
+target_link_libraries(MediaCM PRIVATE Qt6::MultimediaWidgets)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
