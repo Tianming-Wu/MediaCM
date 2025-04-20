@@ -1,0 +1,14 @@
+#panel {
+    background-color: ${WINDOWBG:120};
+    border-radius: 10px;
+}
+
+QPushButton {
+    background-color: transparent;
+    border: 1px solid grey;
+    border-radius: 5px;
+}
+
+QPushButton::pressed {
+    background-color: rgba(0,0,0,50);
+}

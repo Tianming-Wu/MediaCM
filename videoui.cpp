@@ -3,24 +3,37 @@
 
 #include <QShowEvent>
 #include <QCloseEvent>
+#include <QMouseEvent>
 #include <QMediaMetaData>
+#include <QAudioDevice>
 
 VideoUI::VideoUI(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::VideoUI)
+    , ui(new Ui::VideoUI), theme(this)
     , player(new QMediaPlayer(this)), scene(new QGraphicsScene(this)), videoItem(new QGraphicsVideoItem)
     , audio(new QAudioOutput(this))
-    , pct(new QTimer(this))
+    , pct(new QTimer(this)), panelShowTimer(new QTimer(this))
 {
     ui->setupUi(this);
 
     // Initialize
     pct->setInterval(1000);
 
-    ui->volumnBar->hide();
+    panelShowTimer->setInterval(config.PanelShowTimer());
+    panelShowTimer->setSingleShot(true);
+
+    panelSize = ui->panel->size();
 
     player->setPlaybackRate(config.PlaybackRate());
-    audio->setVolume(config.fVolumn());
+
+    ui->buttonVolume->bindSlider(ui->volumeBar);
+    ui->buttonVolume->bindAudioOutput(audio);
+    ui->buttonVolume->setVolume(config.Volume());
+    ui->buttonVolume->setMuted(config.Muted());
+
+    pa_show = new QPropertyAnimation(ui->panel, "pos", this);
+    pa_show->setDuration(200);
+    pa_show->setEasingCurve(QEasingCurve::OutCubic);
 
     // UI Initialize
     player->setVideoOutput(videoItem);
@@ -31,8 +44,13 @@ VideoUI::VideoUI(QWidget *parent)
     videoItem->setSize(ui->graphicsView->size());
 
     // UI Properties
+    ui->graphicsView->setAttribute(Qt::WA_TransparentForMouseEvents);
+    this->setStyleSheet(theme.generate());
+    connect(&theme, &ThemeCM::ThemeChanged, this, [&]{ this->setStyleSheet(theme.generate()); });
+    // theme.generate();
 
     // UI Slots
+    connect(panelShowTimer, &QTimer::timeout, this, [&]{ showPanel(false); });
 
     // UI Signals
     connect(ui->progressBar, &QSlider::sliderPressed, this, [&]{ lastState = isPlaying(); Pause(); pct->start(); });
@@ -44,8 +62,21 @@ VideoUI::VideoUI(QWidget *parent)
     connect(ui->buttonNextFrame, &QPushButton::clicked, this, &VideoUI::NextFrame);
     connect(ui->buttonQuit, &QPushButton::clicked, this, &VideoUI::close);
 
-    connect(ui->buttonVolumn, &QPushButton::toggled, this, [&](bool b){ ui->volumnBar->setVisible(b); });
-    connect(ui->volumnBar, &QSlider::sliderMoved, this, [&](int pos) { config.setVolumn(pos); audio->setVolume(pos /100.0); });
+    // Volume Control
+    connect(ui->buttonVolume, &VolumeButton::VolumeChanged, &config, &ConfigCM::setVolume);
+    connect(ui->buttonVolume, &VolumeButton::MuteChanged, &config, &ConfigCM::setMuted);
+
+    // Control Panel Show / Hide
+    connect(ui->progressBar, &QSlider::sliderPressed, panelShowTimer, &QTimer::stop);
+    connect(ui->progressBar, &QSlider::sliderReleased, this, &VideoUI::tryStartPanelHideTimer);
+
+    connect(ui->buttonPlay, &QPushButton::clicked, this, &VideoUI::tryStartPanelHideTimer);
+    connect(ui->buttonPreviousFrame, &QPushButton::clicked, this, &VideoUI::tryStartPanelHideTimer);
+    connect(ui->buttonNextFrame, &QPushButton::clicked, this, &VideoUI::tryStartPanelHideTimer);
+
+    connect(ui->buttonVolume, &QPushButton::toggled, this, &VideoUI::tryStartPanelHideTimer);
+    connect(ui->volumeBar, &QSlider::sliderPressed, panelShowTimer, &QTimer::stop);
+    connect(ui->volumeBar, &QSlider::sliderReleased, this, &VideoUI::tryStartPanelHideTimer);
 
     // MediaPlayer
     connect(player, &QMediaPlayer::positionChanged, this, &VideoUI::showProgress);
@@ -66,13 +97,12 @@ VideoUI::VideoUI(QWidget *parent)
             frameRate = 30.0;
         }
         msPerFrame = static_cast<qint64>(1000.0 / frameRate);
-
-        qDebug() << frameRate << msPerFrame;
     });
 
 
     QTimer::singleShot(0, this, [&]{
         this->resizeEvent(nullptr);
+        // panelShowTimer->start();
     });
 }
 
@@ -88,8 +118,12 @@ void VideoUI::showProgress(qint64 position)
     ui->progressLabel->setText(formatDuration(position, displayms) + "/" + durationstr);
 }
 
+void VideoUI::tryStartPanelHideTimer() { if(isPlaying()) panelShowTimer->start(); }
+
 bool VideoUI::isPlaying() { return (player->playbackState() == QMediaPlayer::PlayingState); }
 bool VideoUI::isPaused() { return (player->playbackState() == QMediaPlayer::PausedState); }
+
+bool VideoUI::isPanelVisible() { return (panelState == VUI::NormalState); }
 
 void VideoUI::loadVideo(const QUrl &source)
 {
@@ -100,16 +134,20 @@ void VideoUI::loadVideo(const QUrl &source)
 void VideoUI::Play()
 {
     player->play();
+    ui->buttonPlay->setIcon(QIcon(":/ui/pause.png"));
+    if(isPanelVisible()) panelShowTimer->start();
 }
 
 void VideoUI::Pause()
 {
     player->pause();
+    ui->buttonPlay->setIcon(QIcon(":/ui/play.png"));
+    if(isPanelVisible()) panelShowTimer->stop();
 }
 
 void VideoUI::PausePlay()
 {
-    if(player->playbackState() == QMediaPlayer::PlayingState)
+    if(isPlaying())
         Pause();
     else
         Play();
@@ -133,6 +171,19 @@ void VideoUI::NextFrame()
     qint64 targetPos = position + msPerFrame;
     if(targetPos <= duration)
         player->setPosition(targetPos);
+}
+
+void VideoUI::showPanel(bool v)
+{
+    if(isPanelVisible() == v) return;
+    if(v) {
+        pa_show->setDirection(QPropertyAnimation::Forward);
+        panelState = VUI::NormalState;
+    } else {
+        pa_show->setDirection(QPropertyAnimation::Backward);
+        panelState = VUI::HiddenState;
+    }
+    pa_show->start();
 }
 
 QString VideoUI::formatDuration(qint64 duration, bool ms)
@@ -172,14 +223,42 @@ void VideoUI::resizeEvent(QResizeEvent *event)
     QMainWindow::resizeEvent(event);
 
     QSize size = this->size();
-    QSize panelSize = ui->panel->size();
 
     ui->graphicsView->setGeometry(QRect(QPoint(0,0), this->size()));
-    ui->panel->move(size.width() / 2 - (panelSize.width() / 2), size.height() - panelSize.height() - 15 );
+    panelPos = QPoint(size.width() / 2 - (panelSize.width() / 2), size.height() - panelSize.height() - 15);
+    panelHiddenPos = QPoint(panelPos.x(), size.height() + 5);
+    pa_show->setStartValue(panelHiddenPos); pa_show->setEndValue(panelPos);
+    ui->panel->move(isPanelVisible()?panelPos:panelHiddenPos);
 
     if(videoItem && scene) {
         videoItem->setSize(ui->graphicsView->size());
         scene->setSceneRect(0, 0, ui->graphicsView->width(), ui->graphicsView->height());
         ui->graphicsView->viewport()->update();
     }
+}
+
+void VideoUI::mousePressEvent(QMouseEvent *event)
+{
+    if(!dbgclickmark) {
+        if(panelState == VUI::HiddenState) {
+            showPanel(true);
+            tryStartPanelHideTimer();
+        } else {
+            showPanel(false);
+            panelShowTimer->stop();
+        }
+    } else dbgclickmark = false;
+    QMainWindow::mousePressEvent(event);
+}
+
+void VideoUI::mouseReleaseEvent(QMouseEvent *event)
+{
+    QMainWindow::mouseReleaseEvent(event);
+}
+
+void VideoUI::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    dbgclickmark = true;
+    QMainWindow::mouseDoubleClickEvent(event);
+    PausePlay();
 }

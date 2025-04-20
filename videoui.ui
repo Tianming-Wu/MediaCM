@@ -19,13 +19,13 @@
 	border-radius: 10px;
 }
 
-.QPushButton {
+QPushButton {
 	background-color: transparent;
 	border: 1px solid grey;
 	border-radius: 5px;
 }
 
-.QPushButton::pressed {
+QPushButton::pressed {
 	background-color: rgba(0,0,0,50);
 }</string>
   </property>
@@ -38,6 +38,9 @@
       <width>800</width>
       <height>71</height>
      </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
     </property>
     <widget class="QLabel" name="progressLabel">
      <property name="geometry">
@@ -59,6 +62,9 @@
        <width>111</width>
        <height>17</height>
       </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
      </property>
      <property name="text">
       <string>00:00/00:00</string>
@@ -85,6 +91,9 @@
        <height>16</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="maximum">
       <number>10000</number>
      </property>
@@ -97,17 +106,8 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="invertedAppearance">
-      <bool>false</bool>
-     </property>
-     <property name="invertedControls">
-      <bool>false</bool>
-     </property>
-     <property name="tickPosition">
-      <enum>QSlider::NoTicks</enum>
-     </property>
     </widget>
-    <widget class="QPushButton" name="buttonPreviousFrame">
+    <widget class="ThemedButton" name="buttonPreviousFrame">
      <property name="geometry">
       <rect>
        <x>310</x>
@@ -128,11 +128,24 @@
        <height>31</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="text">
-      <string>PreviousFrame</string>
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="uires.qrc">
+       <normaloff>:/ui/back.png</normaloff>:/ui/back.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>21</width>
+       <height>21</height>
+      </size>
      </property>
     </widget>
-    <widget class="QPushButton" name="buttonBackward">
+    <widget class="ThemedButton" name="buttonBackward">
      <property name="geometry">
       <rect>
        <x>350</x>
@@ -153,11 +166,14 @@
        <height>31</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="text">
       <string>Backward</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="buttonPlay">
+    <widget class="ThemedButton" name="buttonPlay">
      <property name="geometry">
       <rect>
        <x>390</x>
@@ -178,14 +194,27 @@
        <height>31</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="text">
-      <string>Play</string>
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="uires.qrc">
+       <normaloff>:/ui/play.png</normaloff>:/ui/play.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>21</width>
+       <height>21</height>
+      </size>
      </property>
      <property name="checkable">
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QPushButton" name="buttonForward">
+    <widget class="ThemedButton" name="buttonForward">
      <property name="geometry">
       <rect>
        <x>430</x>
@@ -206,11 +235,14 @@
        <height>31</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="text">
       <string>Forward</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="buttonNextFrame">
+    <widget class="ThemedButton" name="buttonNextFrame">
      <property name="geometry">
       <rect>
        <x>470</x>
@@ -231,11 +263,24 @@
        <height>31</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="text">
-      <string>NextFrame</string>
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="uires.qrc">
+       <normaloff>:/ui/forward.png</normaloff>:/ui/forward.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>21</width>
+       <height>21</height>
+      </size>
      </property>
     </widget>
-    <widget class="QPushButton" name="buttonQuit">
+    <widget class="ThemedButton" name="buttonQuit">
      <property name="geometry">
       <rect>
        <x>720</x>
@@ -256,6 +301,9 @@
        <height>31</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="text">
       <string>Quit</string>
      </property>
@@ -263,7 +311,7 @@
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QPushButton" name="buttonVolumn">
+    <widget class="VolumeButton" name="buttonVolume">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -284,14 +332,27 @@
        <height>31</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="text">
-      <string>Volume</string>
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="uires.qrc">
+       <normaloff>:/ui/vol/highvolume.png</normaloff>:/ui/vol/highvolume.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>21</width>
+       <height>21</height>
+      </size>
      </property>
      <property name="checkable">
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QSlider" name="volumnBar">
+    <widget class="QSlider" name="volumeBar">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -315,6 +376,9 @@
        <height>16</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="maximum">
       <number>100</number>
      </property>
@@ -329,12 +393,6 @@
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="invertedAppearance">
-      <bool>false</bool>
-     </property>
-     <property name="invertedControls">
-      <bool>false</bool>
      </property>
     </widget>
    </widget>
@@ -364,6 +422,20 @@
    <zorder>panel</zorder>
   </widget>
  </widget>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>ThemedButton</class>
+   <extends>QPushButton</extends>
+   <header>themedbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>VolumeButton</class>
+   <extends>QPushButton</extends>
+   <header>volumebutton.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="uires.qrc"/>
+ </resources>
  <connections/>
 </ui>

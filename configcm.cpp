@@ -9,7 +9,13 @@ ConfigCM::ConfigCM(QObject *parent)
 
 void ConfigCM::writeDefault()
 {
-    setAutoStart(AutoStart());
-
+    // UI
     setDisplayMS(DisplayMS());
+    setPanelShowTimer(PanelShowTimer());
+
+    // Player
+    setAutoStart(AutoStart());
+    setVolume(Volume());
+    setMuted(Muted());
+    setPlaybackRate(PlaybackRate());
 }

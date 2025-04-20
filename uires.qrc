@@ -1,1 +1,19 @@
-<RCC/>
+<RCC>
+    <qresource prefix="/">
+        <file>ui/back.png</file>
+        <file>ui/forward.png</file>
+        <file>ui/nosync.svg</file>
+        <file>ui/pause.png</file>
+        <file>ui/play.png</file>
+        <file>ui/settings.svg</file>
+        <file>ui/sync.svg</file>
+        <file>ui/vol/highvolume.png</file>
+        <file>ui/vol/lowvolume.png</file>
+        <file>ui/vol/mediumvolume.png</file>
+        <file>ui/vol/muted.png</file>
+        <file>ui/vol/nosound.png</file>
+    </qresource>
+    <qresource prefix="/style">
+        <file>ui/base.qss</file>
+    </qresource>
+</RCC>

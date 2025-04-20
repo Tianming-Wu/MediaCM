@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
     VideoUI ui;
     ui.show();
 
-    ui.loadVideo(QUrl::fromLocalFile("/home/ubuntu/Videos/test.mp4"));
-    // ui.loadVideo(videoUrl);
+    if(videoUrl.isEmpty()) videoUrl = QUrl::fromLocalFile("/home/tianming/Videos/test.mp4");
+    ui.loadVideo(videoUrl);
 
     return app.exec();
 }

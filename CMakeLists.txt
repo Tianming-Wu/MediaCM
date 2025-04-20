@@ -16,9 +16,14 @@ find_package(Qt6 REQUIRED COMPONENTS MultimediaWidgets)
 
 set(TS_FILES MediaCM_zh_CN.ts)
 
+include_directories(${CMAKE_SOURCE_DIR})
+
 set(PROJECT_SOURCES
-        main.cpp error.h
+        main.cpp error.h about.h
         configcm.h configcm.cpp
+        themecm.h themecm.cpp
+        themedbutton.h themedbutton.cpp
+        volumebutton.h volumebutton.cpp
         videoui.cpp videoui.h videoui.ui
         uires.qrc
         ${TS_FILES}

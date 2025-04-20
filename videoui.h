@@ -8,14 +8,22 @@
 #include <QFileDialog>
 #include <QGraphicsVideoItem>
 #include <QTimer>
+#include <QPropertyAnimation>
 
 #include "configcm.h"
+#include "themecm.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class VideoUI;
 }
 QT_END_NAMESPACE
+
+namespace VUI {
+enum PanelState {
+    NormalState, HiddenState
+};
+}
 
 class VideoUI : public QMainWindow
 {
@@ -28,6 +36,8 @@ public:
     bool isPlaying();
     bool isPaused();
 
+    bool isPanelVisible();
+
 public slots:
     void loadVideo(const QUrl& source);
 
@@ -38,9 +48,15 @@ public slots:
     void PreviousFrame();
     void NextFrame();
 
+    void showPanel(bool v);
+    void showPanel() {
+        showPanel(!isPanelVisible());
+    }
+
 protected slots:
     void showProgress(qint64 position);
 
+    void tryStartPanelHideTimer();
 
 protected:
     QString formatDuration(qint64 duration, bool ms = false);
@@ -48,6 +64,10 @@ protected:
 
     void showEvent(QShowEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
     Ui::VideoUI *ui;
@@ -57,9 +77,6 @@ private:
     QGraphicsVideoItem *videoItem;
     QAudioOutput *audio;
 
-    QTimer *pct;
-    bool lastState;
-
     QUrl source;
     qreal pc;
     qint64 duration;
@@ -67,6 +84,18 @@ private:
     double frameRate;
     qint64 msPerFrame;
 
+    QTimer *pct;
+    bool lastState;
+
+    bool dbgclickmark;
+
+    QSize panelSize;
+    QPoint panelPos, panelHiddenPos;
+    VUI::PanelState panelState = VUI::NormalState;
+    QTimer *panelShowTimer;
+    QPropertyAnimation *pa_show;
+
     ConfigCM config;
+    ThemeCM theme;
 };
 #endif // VIDEOUI_H
