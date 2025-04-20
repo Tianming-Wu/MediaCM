@@ -77,27 +77,27 @@ jobs:
         
       - name: Install Dependencies
         run: |
-          sudo apt install -y cmake qt6-base-dev qt6-wayland-dev qt6-multimedia-dev linguist-qt6 clang
-        shell: pwsh
+          sudo apt install -y cmake qt6-base-dev qt6-wayland-dev qt6-multimedia-dev qttools6-dev-tools libxkbcommon-dev clang
+        shell: bash
         
       - name: Configure CMake
         run: |
           mkdir build
           cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Release
-        shell: pwsh
+        shell: bash
 
       - name: Build
         run: |
           cd build
           cmake --build . --config=Release
-        shell: pwsh
+        shell: bash
           
       - name: Package
         run: |
-          mkdir release
+          mkdir -p release
           cd build
-          Compress-Archive -Path MediaCM -DestinationPath ../release/MediaCM-Ubuntu-${{ env.VERSION }}-x86_64.zip
-        shell: pwsh
+          zip -r ../release/MediaCM-Ubuntu-${{ env.VERSION }}-x86_64.zip MediaCM
+        shell: bash
         
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -123,27 +123,27 @@ jobs:
         
       - name: Install Dependencies
         run: |
-          sudo apt install -y cmake qt6-base-dev qt6-wayland-dev qt6-multimedia-dev linguist-qt6 clang --fix-missing || true
-        shell: pwsh
+          sudo apt install -y cmake qt6-base-dev qt6-wayland-dev qt6-multimedia-dev qttools6-dev-tools libxkbcommon-dev clang --fix-missing || true
+        shell: bash
         
       - name: Configure CMake
         run: |
           mkdir build
           cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Release
-        shell: pwsh
+        shell: bash
 
       - name: Build
         run: |
           cd build
           cmake --build . --config=Release
-        shell: pwsh
+        shell: bash
           
       - name: Package
         run: |
-          mkdir release
+          mkdir -p release
           cd build
-          Compress-Archive -Path MediaCM -DestinationPath ../release/MediaCM-Ubuntu-${{ env.VERSION }}-aarch64.zip
-        shell: pwsh
+          zip -r ../release/MediaCM-Ubuntu-${{ env.VERSION }}-aarch64.zip MediaCM
+        shell: bash
         
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
