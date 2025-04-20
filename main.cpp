@@ -37,13 +37,22 @@ int main(int argc, char *argv[])
                 else return 3;
                 cpos += 2;
             } else return 4;
-        } else return 5;
+        } else {
+            if(videoUrl.isEmpty())
+                videoUrl = QUrl::fromLocalFile(arg[cpos]);
+            cpos += 1;
+        }
     }
 
     VideoUI ui;
     ui.show();
 
+#ifdef Q_OS_LINUX
     if(videoUrl.isEmpty()) videoUrl = QUrl::fromLocalFile("/home/tianming/Videos/test.mp4");
+#else
+    if(videoUrl.isEmpty()) videoUrl = QUrl::fromLocalFile(QApplication::applicationDirPath() + "/test.mp4");
+#endif
+
     ui.loadVideo(videoUrl);
 
     return app.exec();
